@@ -9,10 +9,15 @@ export default function ProfitTracker() {
   // daily + monthly figures
   const { monthlyFinance, analysis } = useContext(RestaurantContext);
 
+  // Real monthly figures computed from the uploaded sales (present only when the
+  // file had a price column); otherwise fall back to the sample data.
+  const real = analysis && analysis.monthly_finance && analysis.monthly_finance.length
+    ? analysis.monthly_finance : null;
+  const months = real || monthlyFinance;
+  const isReal = !!real;
+
   // which month is being viewed (default: most recent). Lets you step back in time.
-  const [monthIdx, setMonthIdx] = useState(
-    monthlyFinance.length ? monthlyFinance.length - 1 : 0
-  );
+  const [monthIdx, setMonthIdx] = useState(months.length ? months.length - 1 : 0);
 
   // nothing to show until a sales file has been imported
   if (!analysis) {
@@ -26,9 +31,10 @@ export default function ProfitTracker() {
     );
   }
 
-  const selected = monthlyFinance[monthIdx] || { month: '-', sales: 0, cost: 0, profit: 0 };
-  const canPrev = monthIdx > 0;
-  const canNext = monthIdx < monthlyFinance.length - 1;
+  const idx = Math.min(monthIdx, months.length - 1);
+  const selected = months[idx] || { month: '-', sales: 0, cost: 0, profit: 0 };
+  const canPrev = idx > 0;
+  const canNext = idx < months.length - 1;
   const navBtn = (enabled) => ({
     background: enabled ? '#133e87' : '#c7d4e6', color: '#fff', border: 'none',
     borderRadius: '50%', width: 36, height: 36, fontSize: '1.1rem',
@@ -44,13 +50,13 @@ export default function ProfitTracker() {
         {/* month browser: step back/forward through the months on record */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <button style={navBtn(canPrev)} disabled={!canPrev}
-                  onClick={() => canPrev && setMonthIdx(monthIdx - 1)}>‹</button>
+                  onClick={() => canPrev && setMonthIdx(idx - 1)}>‹</button>
           <span style={{ background: '#133e87', color: 'white', padding: '0.5rem 1.25rem',
                          borderRadius: '50px', fontWeight: 600, minWidth: 64, textAlign: 'center' }}>
             📅 {selected.month}
           </span>
           <button style={navBtn(canNext)} disabled={!canNext}
-                  onClick={() => canNext && setMonthIdx(monthIdx + 1)}>›</button>
+                  onClick={() => canNext && setMonthIdx(idx + 1)}>›</button>
         </div>
       </div>
 
@@ -71,9 +77,9 @@ export default function ProfitTracker() {
       </div>
 
       <p style={{ textAlign: 'center', fontSize: '0.8rem', color: '#999', marginTop: '0.75rem' }}>
-        ℹ️ Profit figures are sample data for demonstration. Connect your POS / sales
-        totals to see real numbers — the forecast, prep, shopping and savings above
-        are computed from your uploaded sales.
+        {isReal
+          ? 'Computed from your uploaded sales: revenue = price × quantity; cost estimated from recipes.'
+          : 'ℹ️ Profit figures are sample data — add a price column to your sales file to see real revenue & profit.'}
       </p>
 
       <hr style={{ margin: '2rem 0', borderColor: '#eee' }} />
@@ -86,7 +92,7 @@ export default function ProfitTracker() {
         <div style={{ flex: '2', minWidth: '400px', background: 'white', padding: '1rem', borderRadius: '8px', border: '1px solid #dee2e6' }}>
           <h4 style={{ textAlign: 'center', marginBottom: '1rem' }}>Sales / Cost / Profit Graph</h4>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={monthlyFinance}>
+            <BarChart data={months}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis />
@@ -110,16 +116,16 @@ export default function ProfitTracker() {
               </tr>
             </thead>
             <tbody>
-              {monthlyFinance.map((data, index) => (
+              {months.map((data, index) => (
                 <tr
                   key={index}
                   onClick={() => setMonthIdx(index)}
                   style={{
                     borderBottom: '1px solid #eee', cursor: 'pointer',
-                    background: index === monthIdx ? '#eef3fb' : 'transparent',
+                    background: index === idx ? '#eef3fb' : 'transparent',
                   }}
                 >
-                  <td style={{ padding: '8px', fontWeight: index === monthIdx ? 700 : 400 }}>{data.month}</td>
+                  <td style={{ padding: '8px', fontWeight: index === idx ? 700 : 400 }}>{data.month}</td>
                   <td style={{ padding: '8px', textAlign: 'right', color: 'green', fontWeight: 'bold' }}>
                     {data.profit.toLocaleString()}
                   </td>

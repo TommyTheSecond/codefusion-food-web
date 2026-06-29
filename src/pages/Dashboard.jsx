@@ -21,6 +21,9 @@ export default function Dashboard() {
   };
 
   const savings = analysis && analysis.savings;
+  // real latest-month figures if the upload had a price column; else sample
+  const mf = analysis && analysis.monthly_finance;
+  const latest = mf && mf.length ? mf[mf.length - 1] : null;
 
   return (
     <div className="container">
@@ -63,16 +66,17 @@ export default function Dashboard() {
         <div style={{ maxWidth: 420, margin: '0.75rem auto 0', textAlign: 'left' }}>
           <p style={{ fontSize: '0.8rem', color: '#555', margin: '0 0 0.35rem' }}>
             Expected columns: <b>date</b>, <b>dish</b>, <b>qty</b> — one row per dish per day.
-            English or Thai headers and <b>.xlsx</b> also work.
+            <b> price</b> is optional (add it to see real profit). English or Thai
+            headers and <b>.xlsx</b> also work.
           </p>
           <pre style={{
             background: '#fff', border: '1px solid #dee2e6', borderRadius: 6,
             padding: '0.6rem 0.8rem', fontSize: '0.78rem', color: '#133e87',
             margin: 0, overflowX: 'auto',
-          }}>{`date,dish,qty
-2026-06-26,Pad Thai,52
-2026-06-26,Green Curry,33
-2026-06-27,Pad Thai,61`}</pre>
+          }}>{`date,dish,qty,price
+2026-06-26,Pad Thai,52,60
+2026-06-26,Green Curry,33,70
+2026-06-27,Pad Thai,61,60`}</pre>
         </div>
       </div>
 
@@ -85,8 +89,17 @@ export default function Dashboard() {
 
       {analysis && (
         <div className="profit-summary-small">
-          <p>Today's sales: THB {finance.sales} <span style={{ fontSize: '0.75rem', color: '#999' }}>(sample)</span></p>
-          <p>profit: THB {finance.sales - finance.cost} <span style={{ fontSize: '0.75rem', color: '#999' }}>(sample)</span></p>
+          {latest ? (
+            <>
+              <p>Sales ({latest.month}): THB {latest.sales.toLocaleString()}</p>
+              <p>Profit ({latest.month}): THB {latest.profit.toLocaleString()}</p>
+            </>
+          ) : (
+            <>
+              <p>Today's sales: THB {finance.sales} <span style={{ fontSize: '0.75rem', color: '#999' }}>(sample)</span></p>
+              <p>profit: THB {finance.sales - finance.cost} <span style={{ fontSize: '0.75rem', color: '#999' }}>(sample)</span></p>
+            </>
+          )}
           {savings && (
             <p style={{ color: '#1a7f37' }}>
               ♻️ Est. waste avoided next week: {savings.kg_saved} kg
