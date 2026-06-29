@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useEffect, useState } from 'react';
 import { analyzeSales } from '../api';
 
 export const RestaurantContext = createContext();
@@ -29,11 +29,18 @@ export const RestaurantProvider = ({ children }) => {
   ]);
 
   // ---- AI forecast result (from the Python backend) -----------------------
-  // null until a sales file is uploaded and analyzed. Every AI-driven page
-  // reads from here; pages fall back to static content when it's null.
-  const [analysis, setAnalysis] = useState(null);
+  // Persisted to localStorage so the forecast (and the prep/order checklists
+  // tied to it) survive a page refresh. null until a sales file is analyzed.
+  const [analysis, setAnalysis] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('analysis') || 'null'); }
+    catch { return null; }
+  });
   const [analyzing, setAnalyzing] = useState(false);
   const [analyzeError, setAnalyzeError] = useState(null);
+
+  useEffect(() => {
+    if (analysis) localStorage.setItem('analysis', JSON.stringify(analysis));
+  }, [analysis]);
 
   // Upload a sales spreadsheet -> forecast + prep/shopping lists + savings.
   // Sends the restaurant's current menus as recipes so ingredient breakdowns
