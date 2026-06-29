@@ -70,6 +70,12 @@ export default function ProfitTracker() {
         </div>
       </div>
 
+      <p style={{ textAlign: 'center', fontSize: '0.8rem', color: '#999', marginTop: '0.75rem' }}>
+        ℹ️ Profit figures are sample data for demonstration. Connect your POS / sales
+        totals to see real numbers — the forecast, prep, shopping and savings above
+        are computed from your uploaded sales.
+      </p>
+
       <hr style={{ margin: '2rem 0', borderColor: '#eee' }} />
 
       {/* 2. monthly summary + chart (bottom) */}

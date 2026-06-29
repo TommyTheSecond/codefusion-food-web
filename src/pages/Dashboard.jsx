@@ -69,8 +69,8 @@ export default function Dashboard() {
 
       {analysis && (
         <div className="profit-summary-small">
-          <p>Today's sales: THB {finance.sales}</p>
-          <p>profit: THB {finance.sales - finance.cost}</p>
+          <p>Today's sales: THB {finance.sales} <span style={{ fontSize: '0.75rem', color: '#999' }}>(sample)</span></p>
+          <p>profit: THB {finance.sales - finance.cost} <span style={{ fontSize: '0.75rem', color: '#999' }}>(sample)</span></p>
           {savings && (
             <p style={{ color: '#1a7f37' }}>
               ♻️ Est. waste avoided next week: {savings.kg_saved} kg
