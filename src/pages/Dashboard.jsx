@@ -1,12 +1,13 @@
-import React, { useContext, useRef } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RestaurantContext } from '../context/RestaurantContext';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { finance, analysis, analyzing, analyzeError, runAnalysis } =
+  const { finance, analysis, analyzing, analyzeError, runAnalysis, clearData } =
     useContext(RestaurantContext);
   const fileRef = useRef(null);
+  const [confirmClear, setConfirmClear] = useState(false);
 
   const handleFile = async (e) => {
     const file = e.target.files && e.target.files[0];
@@ -60,6 +61,23 @@ export default function Dashboard() {
             {' '}({analysis.date_range?.[0]} → {analysis.date_range?.[1]} history).
             Open Prepare / Order to see it.
           </p>
+        )}
+        {analysis && !analyzing && (
+          <button
+            onClick={() => {
+              if (confirmClear) { clearData(); setConfirmClear(false); }
+              else setConfirmClear(true);
+            }}
+            onBlur={() => setConfirmClear(false)}
+            style={{
+              marginTop: '0.25rem', background: 'transparent', cursor: 'pointer',
+              border: `1px solid ${confirmClear ? '#b00020' : '#c7894f'}`,
+              color: confirmClear ? '#b00020' : '#a05a2c',
+              borderRadius: 6, padding: '0.3rem 0.8rem', fontSize: '0.8rem',
+            }}
+          >
+            {confirmClear ? 'Click again to confirm — clear data' : '🗑 Clear imported data'}
+          </button>
         )}
 
         {/* expected file format */}

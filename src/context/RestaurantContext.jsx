@@ -73,6 +73,17 @@ export const RestaurantProvider = ({ children }) => {
     }
   };
 
+  // remove this restaurant's imported forecast + its prep/order checklists
+  const clearData = () => {
+    setAnalysis(null);
+    setAnalyzeError(null);
+    if (storeId) {
+      localStorage.removeItem(`analysis_${storeId}`);
+      localStorage.removeItem(`prep_checklist_${storeId}`);
+      localStorage.removeItem(`order_checklist_${storeId}`);
+    }
+  };
+
   const addMenu = (newMenu) => setMenus([...menus, newMenu]);
   const deleteMenu = (id) => setMenus(menus.filter(menu => menu.id !== id));
 
@@ -92,7 +103,7 @@ export const RestaurantProvider = ({ children }) => {
     <RestaurantContext.Provider value={{
       storeId, selectStore,
       menus, addMenu, deleteMenu, addIngredient, removeIngredient, finance, monthlyFinance,
-      analysis, analyzing, analyzeError, runAnalysis,
+      analysis, analyzing, analyzeError, runAnalysis, clearData,
     }}>
       {children}
     </RestaurantContext.Provider>
