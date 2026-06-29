@@ -58,6 +58,22 @@ export default function Dashboard() {
             Open Prepare / Order to see it.
           </p>
         )}
+
+        {/* expected file format */}
+        <div style={{ maxWidth: 420, margin: '0.75rem auto 0', textAlign: 'left' }}>
+          <p style={{ fontSize: '0.8rem', color: '#555', margin: '0 0 0.35rem' }}>
+            Expected columns: <b>date</b>, <b>dish</b>, <b>qty</b> — one row per dish per day.
+            English or Thai headers and <b>.xlsx</b> also work.
+          </p>
+          <pre style={{
+            background: '#fff', border: '1px solid #dee2e6', borderRadius: 6,
+            padding: '0.6rem 0.8rem', fontSize: '0.78rem', color: '#133e87',
+            margin: 0, overflowX: 'auto',
+          }}>{`date,dish,qty
+2026-06-26,Pad Thai,52
+2026-06-26,Green Curry,33
+2026-06-27,Pad Thai,61`}</pre>
+        </div>
       </div>
 
       <div className="menu-grid">
