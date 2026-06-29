@@ -10,17 +10,21 @@ function fmtAmount(amount, unit) {
 
 export default function OrderSheet() {
   const navigate = useNavigate();
-  const { analysis } = useContext(RestaurantContext);
+  const { analysis, storeId } = useContext(RestaurantContext);
+  const storeKey = `order_checklist_${storeId || 'x'}`;
 
-  // which shopping items are bought, keyed by ingredient. Persisted so the
-  // checklist survives refreshes/sessions.
+  // which shopping items are bought, keyed by ingredient. Persisted per store.
   const [bought, setBought] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('order_checklist') || '{}'); }
+    try { return JSON.parse(localStorage.getItem(storeKey) || '{}'); }
     catch { return {}; }
   });
   useEffect(() => {
-    localStorage.setItem('order_checklist', JSON.stringify(bought));
-  }, [bought]);
+    try { setBought(JSON.parse(localStorage.getItem(storeKey) || '{}')); }
+    catch { setBought({}); }
+  }, [storeKey]);
+  useEffect(() => {
+    localStorage.setItem(storeKey, JSON.stringify(bought));
+  }, [bought, storeKey]);
   const toggle = (key) => setBought((b) => ({ ...b, [key]: !b[key] }));
 
   // ---- AI-driven view: one weekly shopping list, ingredients summed -------

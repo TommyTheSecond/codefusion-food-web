@@ -1,8 +1,15 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { RestaurantContext } from '../context/RestaurantContext';
 
 export default function StoreSelection() {
   const navigate = useNavigate();
+  const { selectStore } = useContext(RestaurantContext);
+
+  const openStore = (id) => {
+    selectStore(id);      // load this restaurant's own data
+    navigate('/dashboard');
+  };
 
   const [stores, setStores] = useState(() => {
     const savedStores = localStorage.getItem('restaurant_list');
@@ -44,10 +51,10 @@ export default function StoreSelection() {
 
       <div className='store-grid'>
         {stores.map((store) => (
-          <div 
-            key={store.id} 
-            className='store-card' 
-            onClick={() => navigate('/dashboard')}
+          <div
+            key={store.id}
+            className='store-card'
+            onClick={() => openStore(store.id)}
           >
             <h3>{store.name}</h3>
             

@@ -26,7 +26,8 @@ function prettyDate(iso) {
 
 export default function Calculator() {
   const navigate = useNavigate();
-  const { analysis } = useContext(RestaurantContext);
+  const { analysis, storeId } = useContext(RestaurantContext);
+  const storeKey = `prep_checklist_${storeId || 'x'}`;
 
   const byDate = useMemo(() => groupByDate(analysis && analysis.prep_list), [analysis]);
   const dates = Object.keys(byDate).sort();
@@ -36,12 +37,17 @@ export default function Calculator() {
   // which prep items the kitchen has ticked off, keyed by "date|ingredient".
   // Persisted to localStorage so the checklist survives refreshes/sessions.
   const [done, setDone] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('prep_checklist') || '{}'); }
+    try { return JSON.parse(localStorage.getItem(storeKey) || '{}'); }
     catch { return {}; }
   });
+  // reload this store's checklist whenever the open restaurant changes
   useEffect(() => {
-    localStorage.setItem('prep_checklist', JSON.stringify(done));
-  }, [done]);
+    try { setDone(JSON.parse(localStorage.getItem(storeKey) || '{}')); }
+    catch { setDone({}); }
+  }, [storeKey]);
+  useEffect(() => {
+    localStorage.setItem(storeKey, JSON.stringify(done));
+  }, [done, storeKey]);
   const toggle = (key) => setDone((d) => ({ ...d, [key]: !d[key] }));
 
   // ---- AI-driven view: real forecast-based prep amounts per day -----------
