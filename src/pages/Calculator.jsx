@@ -1,4 +1,4 @@
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RestaurantContext } from '../context/RestaurantContext';
 
@@ -33,8 +33,15 @@ export default function Calculator() {
   const [activeDate, setActiveDate] = useState(null);
   const day = activeDate || dates[0];
 
-  // which prep items the kitchen has ticked off, keyed by "date|ingredient"
-  const [done, setDone] = useState({});
+  // which prep items the kitchen has ticked off, keyed by "date|ingredient".
+  // Persisted to localStorage so the checklist survives refreshes/sessions.
+  const [done, setDone] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('prep_checklist') || '{}'); }
+    catch { return {}; }
+  });
+  useEffect(() => {
+    localStorage.setItem('prep_checklist', JSON.stringify(done));
+  }, [done]);
   const toggle = (key) => setDone((d) => ({ ...d, [key]: !d[key] }));
 
   // ---- AI-driven view: real forecast-based prep amounts per day -----------
